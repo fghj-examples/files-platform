@@ -1,0 +1,19 @@
+version: "2.0"
+
+# Shared infrastructure. Nothing here is owned by one service: files-api
+# enqueues thumbnail jobs and files-worker consumes them, and both reach the
+# same Redis by depending on the `redis` flow below.
+services:
+  redis:
+    image: redis:7-alpine
+    ports: ["6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2
+      retries: 15
+    volumes:
+      - name: redis-data
+        container: /data
+
+flows:
+  cache: [redis]
